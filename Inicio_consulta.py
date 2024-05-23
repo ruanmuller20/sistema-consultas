@@ -106,6 +106,8 @@ def fechar_janela_3_abrir_janela_6():
     janela_3.destroy()
     janela_principal()
     
+#comentario
+    
 def fechar_janela_2_abrir_janela_6():
     janela_2.destroy()
     janela_principal()
