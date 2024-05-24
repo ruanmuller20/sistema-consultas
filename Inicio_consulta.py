@@ -86,7 +86,7 @@ def salvar_info_e_fechar_janela(nome, cpf, telefone, nascimento, especialidade):
             except sqlite3.Error as e:
                 messagebox.showerror('Erro', f'Erro ao salvar informações: {e}')
     else:
-            messagebox.showinfo('Mensagem de Erro', 'Dados inválidos. Por favor, insira o CPF no formato xxx.xxx.xxx-xx, a data no formato DD-MM-YYYY e o telefone no formato (xx) xxxxx-xxxx.')
+            messagebox.showinfo('Mensagem de Erro', 'Dados inválidos. Por favor, insira o CPF no formato xxx.xxx.xxx-xx, a data no formato DD/MM/YYYY e o telefone no formato (xx) xxxxx-xxxx.')
    
 
 def fechar_janela_6_abrir_janela_2():
@@ -255,6 +255,7 @@ def marcar_consulta():
             if resultado:
                 inserir_consulta(medico, data, horario, cpf)
                 messagebox.showinfo('Consulta marcada','Sua consulta foi marcada com sucesso!')
+                fechar_janela_3_abrir_janela_6()
             else:
                 messagebox.showerror('Erro', 'Paciente não encontrado. Verifique o CPF do paciente')
                 
@@ -339,6 +340,7 @@ def excluir_cadastro():
                         cursor.execute(consulta_remocao, (cpf,))
                         connection.commit()
                         messagebox.showinfo('Cadastro Removido', 'Cadastro removido com sucesso!')
+                        fechar_janela_5_abrir_janela_6()
                     else:
                         messagebox.showinfo('Mensagem de Aviso', 'CPF não encontrado. Insira um CPF válido.')
             except Exception as ex:
