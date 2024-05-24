@@ -12,9 +12,9 @@ cursor = connection.cursor()
 
 # Criação da tabela sql
 cursor.execute('''CREATE TABLE IF NOT EXISTS patients
-                (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                (
                 nome TEXT,
-                cpf TEXT,
+                cpf TEXT PRIMARY KEY,
                 telefone TEXT,
                 nascimento TEXT,
                 especialidade TEXT)''')
@@ -25,7 +25,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS consulta
                 data TEXT,
                 horario TEXT,
                 cpf TEXT,
-                FOREIGN KEY(cpf) REFERENCES patients(id))''')
+                FOREIGN KEY(cpf) REFERENCES patients(cpf))''')
 
 connection.commit()
 
