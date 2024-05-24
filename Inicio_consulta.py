@@ -18,7 +18,18 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS patients
                 telefone TEXT,
                 nascimento TEXT,
                 especialidade TEXT)''')
+
+cursor.execute('''CREATE TABLE IF NOT EXISTS consulta
+                (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                medico TEXT,
+                data TEXT,
+                horario TEXT,
+                cpf TEXT,
+                FOREIGN KEY(cpf) REFERENCES patients(id))''')
+
 connection.commit()
+
+
 
 
 
@@ -27,8 +38,13 @@ def inserir_informacao(nome, cpf, telefone, nascimento, especialidade):
     cursor.execute('''INSERT INTO patients (nome, cpf, telefone, nascimento, especialidade)
                     VALUES (?, ?, ?, ?, ?)''', (nome, cpf, telefone, nascimento, especialidade))
     connection.commit()
-    
-    
+
+def inserir_consulta(medico, data, horario, cpf):
+            cursor.execute('''INSERT INTO consulta (medico, data, horario, cpf) 
+                           VALUES (?, ?, ?, ?)''',(medico, data, horario, cpf))
+            connection.commit()
+   
+
 
 
 
@@ -48,7 +64,7 @@ def validar_telefone(telefone):
 
 def fechar_conexao():
      connection.close()
-     janela_5.destroy()
+     
   
         
         
@@ -205,8 +221,8 @@ def marcar_consulta():
     data_descricao = CTkLabel(frame_principal3, text="Selecione a data:", font=CTkFont(size=12))
     data_descricao.grid(column=0, row=2, padx=10, pady=10)
     
-    data_escolha = CTkEntry(frame_principal3, placeholder_text='DD/MM/AAAA', width=200, font=CTkFont(size=12), justify="center")
-    data_escolha.grid(column=1, row=2, padx=10, pady=10)
+    data_entrada = CTkEntry(frame_principal3, placeholder_text='DD/MM/AAAA', width=200, font=CTkFont(size=12), justify="center")
+    data_entrada.grid(column=1, row=2, padx=10, pady=10)
     
     horario_descricao = CTkLabel(frame_principal3, text="Selecione o horário:", font=CTkFont(size=12))
     horario_descricao.grid(column=0, row=3, padx=10, pady=10)
@@ -214,11 +230,48 @@ def marcar_consulta():
     horario_escolha = CTkComboBox(frame_principal3, values=['(Selecione)','09:00', '14:00', '18:00'], font=CTkFont(size=12))
     horario_escolha.grid(column=1, row=3, padx=10, pady=10)
     
-    confirmar = CTkButton(frame_principal3, text="Confirmar", font=CTkFont(size=12))
-    confirmar.grid(column=1, row=4, padx=10, pady=10)
+    cpf_consulta_descricao = CTkLabel(frame_principal3, text="Insira o CPF para Marcação da consulta :", font=CTkFont(size=12))
+    cpf_consulta_descricao.grid(column=0, row=4, padx=10, pady=10)
+
+    cpf_consulta_entrada = CTkEntry(frame_principal3, placeholder_text='CPF do Paciente (no formato xxx.xxx.xxx-xx)', width=205, font=CTkFont(size=12), justify="center")
+    cpf_consulta_entrada.grid(column=1, row=4, padx=10, pady=10)
+    
+    def salvar_consulta():
+        medico = medico_escolha.get()
+        data = data_entrada.get()
+        horario = horario_escolha.get()
+        cpf = cpf_consulta_entrada.get()
+        
+        def validar_cpf(cpf):
+                return len(cpf) == 14 and cpf[3] == '.' and cpf[7] == '.' and cpf[11] == '-'
+        
+        try:
+            if validar_cpf(cpf):
+                    # Verificar se o CPF existe no banco de dados
+                    consulta_verificacao = "SELECT * FROM patients WHERE cpf = ?"
+                    cursor.execute(consulta_verificacao, (cpf,))
+                    resultado = cursor.fetchone()
+            
+            if resultado:
+                inserir_consulta(medico, data, horario, cpf)
+                messagebox.showinfo('Consulta marcada','Sua consulta foi marcada com sucesso!')
+            else:
+                messagebox.showerror('Erro', 'Paciente não encontrado. Verifique o CPF do paciente')
+                
+        except sqlite3.Error as e:
+            messagebox.showerror('Erro', f'Erro ao marcar consulta: {e}')
+        finally:
+            fechar_conexao()
+     
+        
+    confirmar = CTkButton(frame_principal3, command=salvar_consulta, text="Confirmar", font=CTkFont(size=12))
+    confirmar.grid(column=1, row=5, padx=10, pady=10)
     
     voltar = CTkButton(frame_principal3,command= fechar_janela_3_abrir_janela_6, text="Voltar", font=CTkFont(size=12))
-    voltar.grid(column=0, row=4, padx=10, pady=10)
+    voltar.grid(column=0, row=5, padx=10, pady=10)
+    
+
+
     
     
 
@@ -290,10 +343,9 @@ def excluir_cadastro():
                         messagebox.showinfo('Mensagem de Aviso', 'CPF não encontrado. Insira um CPF válido.')
             except Exception as ex:
                 messagebox.showerror('Erro', f'Erro inesperado: {str(ex)}')
-
             finally:
-                # Fechar a conexão após a operação
                 fechar_conexao()
+
             
             # Fechar a janela de remoção após a operação
             frame_principal2.destroy()
