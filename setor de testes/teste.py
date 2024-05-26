@@ -333,6 +333,11 @@ def excluir_cadastro():
     
     cpf_excluir = CTkEntry(frame_principal2, placeholder_text='Insira o CPF (no formato xxx.xxx.xxx-xx)', width=210, font=CTkFont(size=12), justify="center")
     cpf_excluir.grid(column=1, row=1, padx=10, pady=10)
+    
+    
+
+
+
 
 
         
@@ -378,6 +383,8 @@ def excluir_cadastro():
 
   
     janela_5.mainloop() # Fechamento da Janela
+    
+
     
 
 janela_1 = CTk() # Abertura da Janela 

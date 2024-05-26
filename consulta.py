@@ -49,3 +49,64 @@ match consulta:
                 # Exportando para Excel
                 df.to_excel('consulta_agendada.xlsx', index=False)
                 print("Dados exportados com sucesso para 'consulta_agendada.xlsx'.")
+                
+                
+def exibir_consulta():
+  global janela_7 
+  janela_7 = CTk()
+ 
+  set_appearance_mode("dark")
+  set_default_color_theme("dark-blue")
+  #janela_7.title("PitMed: Gestão Clínica") 
+  #janela_7.geometry("600x400")
+  #janela_7.resizable(False, False)
+  
+  titulo = CTkLabel(janela_7, text="Consultas Agendadas ", font=CTkFont(family="Arial", size=15, weight="bold"))
+  titulo.place(x=180, y=35)
+  
+  frame_descricao2 = CTkFrame(janela_7, width=220, height=400) 
+  frame_descricao2.place(x=400, y=50) 
+  
+  verificar_consultas = "SELECT * FROM consulta"
+  cursor.execute(verificar_consultas)
+  consultar = cursor.fetchall()
+  
+  tree = ttk.Treeview(frame_descricao2)
+  estilo = ttk.Style()
+  estilo.configure("Treeview.Heading", font=('Helvetica', 10, 'bold'))
+  
+  tree["columns"] = ("ID", "medico", "data", "horario", "cpf")
+  
+  tree.column("#0", width=0, stretch=tk.NO)
+  tree.column("ID", anchor=tk.W, width=200)
+  tree.column("medico", anchor=tk.W, width=200)
+  tree.column("data", anchor=tk.W, width=200)
+  tree.column("horario", anchor=tk.W, width=200)
+  tree.column("cpf", anchor=tk.W, width=200)
+  
+  #cabeçalho
+  tree.heading("#0",text="",anchor=tk.W)
+  tree.heading("ID",text="ID",anchor=tk.W)
+  tree.heading("medico",text="Medico",anchor=tk.W)
+  tree.heading("data",text="Data",anchor=tk.W)
+  tree.heading("horario",text="Horário",anchor=tk.W)
+  tree.heading("cpf",text="Cpf",anchor=tk.W)
+  
+  tree.insert("", tk.END, values=([0],[1],[2],[3],[4]))
+  
+  tree.pack(padx=10, pady=10)
+
+      
+  
+  
+  
+  
+  
+  
+  
+  
+  voltar2 = CTkButton(frame_descricao2, text="Voltar", command=lambda: fechar_janela_7_abrir_janela_6(), image=CTkImage(imagem_botao), font=CTkFont(size=12))  
+  voltar2.grid(pady=10)
+
+  
+  janela_7.mainloop()

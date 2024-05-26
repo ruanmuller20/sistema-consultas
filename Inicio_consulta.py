@@ -4,6 +4,9 @@ from tkinter import *
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from datetime import datetime, timedelta
+import tkinter as tk
+from tkinter import ttk
+
 
 
 # Criando conexão com banco de dados
@@ -122,11 +125,19 @@ def fechar_janela_3_abrir_janela_6():
     janela_3.destroy()
     janela_principal()
     
-#comentario
+def fechar_janela_6_abrir_janela_7():
+    janela_6.destroy()
+    exibir_consulta()
     
 def fechar_janela_2_abrir_janela_6():
     janela_2.destroy()
     janela_principal()
+
+def fechar_janela_7_abrir_janela_6():
+    janela_7.destroy()
+    janela_principal()
+    
+    
 
 
 
@@ -181,9 +192,9 @@ def informacoes_paciente():
     
     
     confirmacao = CTkButton(janela_2, text="Confirmar", command=lambda: salvar_info_e_fechar_janela(nome_entrada.get(), cpf_entrada.get(), telefone_entrada.get(), nascimento_entrada.get(), especialidade_escolha.get()), image=CTkImage(imagem_botao), font=CTkFont(size=12))  
-    confirmacao.grid(column=0, row=1, padx=10, pady=10)
+    confirmacao.grid(column=0, row=5, padx=10, pady=10)
     
-    voltar_2 = CTkButton(frame_principal,command= fechar_janela_2_abrir_janela_6, text="Voltar", font=CTkFont(size=12))
+    voltar_2 = CTkButton(frame_principal,command= fechar_janela_2_abrir_janela_6, text="Voltar",image=CTkImage(imagem_botao), font=CTkFont(size=12))
     voltar_2.grid(column=0, row=5, padx=10, pady=10)
     
     janela_2.mainloop()
@@ -265,10 +276,10 @@ def marcar_consulta():
             fechar_conexao()
      
         
-    confirmar = CTkButton(frame_principal3, command=salvar_consulta, text="Confirmar", font=CTkFont(size=12))
+    confirmar = CTkButton(frame_principal3, command=salvar_consulta, text="Confirmar",image=CTkImage(imagem_botao), font=CTkFont(size=12))
     confirmar.grid(column=1, row=5, padx=10, pady=10)
     
-    voltar = CTkButton(frame_principal3,command= fechar_janela_3_abrir_janela_6, text="Voltar", font=CTkFont(size=12))
+    voltar = CTkButton(frame_principal3,command= fechar_janela_3_abrir_janela_6, text="Voltar",image=CTkImage(imagem_botao), font=CTkFont(size=12))
     voltar.grid(column=0, row=5, padx=10, pady=10)
     
 
@@ -373,6 +384,16 @@ def janela_principal():
  janela_6.geometry("600x400")
  janela_6.resizable(False, False)
  
+ imagem_tela = CTkImage(dark_image=Image.open("Logo_clinica.png"), size=(400, 300))
+
+# Adicionando a imagem como fundo
+ label_imagem = CTkLabel(janela_6,image=imagem_tela, text="")  # Convertendo para ImageTk
+ label_imagem.place(x=250, y=50)
+ 
+
+ titulo_principal = CTkLabel(janela_6, text="Selecione o que deseja abaixo: ", font=CTkFont(family="Arial", size=15, weight="bold"))
+ titulo_principal.place(x=180, y=35)
+ 
  frame_principal4 = CTkFrame(janela_6, width=580, height=380)
  frame_principal4.place(x=90, y=90)
  
@@ -388,7 +409,68 @@ def janela_principal():
  excluir_paciente = CTkButton(frame_principal4,text="Excluir Cadastro",command=fechar_janela_6_abrir_janela_5, width=20, image=CTkImage(imagem_botao), font=CTkFont(size=12)) 
  excluir_paciente.grid(row=4, column=0, padx=10, pady=10)
  
+ mostrar_consulta =  CTkButton(frame_principal4,text="Exibir Consultas",command=exibir_consulta, width=20, image=CTkImage(imagem_botao), font=CTkFont(size=12)) 
+ mostrar_consulta.grid(row=4, column=0, padx=10, pady=10)
+ 
  janela_6.mainloop()
+ 
+
+ 
+
+def exibir_consulta():
+  global janela_7 
+  janela_7 = CTk()
+  
+ 
+  set_appearance_mode("dark")
+  set_default_color_theme("dark-blue")
+  janela_7.title("PitMed: Gestão Clínica") 
+  janela_7.geometry("700x400")
+  janela_7.resizable(False, False)
+  
+  titulo = CTkLabel(janela_7, text="Consultas Agendadas", font=CTkFont(family="Arial", size=15, weight="bold"))
+  titulo.place(x=250, y=35)
+  
+  
+  frame_descricao2 = CTkFrame(janela_7, width=220, height=400) 
+  frame_descricao2.place(relx=0.5, rely=0.5, anchor="center") 
+  
+  style = ttk.Style()
+  style.configure("Treeview.Heading", font=('Arial', 10, 'bold'))
+  
+  tree = ttk.Treeview(frame_descricao2, columns=("medico", "data", "horario", "cpf"), show='headings')
+  tree.heading("medico",text="Médico", anchor=tk.CENTER)
+  tree.heading("data", text="Data", anchor=tk.CENTER)
+  tree.heading("horario", text="Horário", anchor=tk.CENTER)
+  tree.heading("cpf", text="CPF", anchor=tk.CENTER)
+  tree.pack(fill="both", expand=True)
+  
+  scrollbar = ttk.Scrollbar(frame_descricao2, orient="vertical",command=tree.yview)
+  scrollbar.pack(side="right", fill="y")
+  tree.configure(yscrollcommand=scrollbar.set)
+  
+  cursor.execute("SELECT medico, data, horario, cpf FROM consulta")
+  consultas = cursor.fetchall()
+  for consulta in consultas:
+      tree.insert("", "end", values=consulta)
+      
+  tree.pack(padx=10, pady=10)
+ 
+      
+  
+  
+  
+  
+  
+  
+  
+  
+  #voltar2 = CTkButton(frame_descricao2, text="Voltar", command=lambda: fechar_janela_7_abrir_janela_6(),font=CTkFont(size=12))  
+  #voltar2.pack(padx=10,pady=10)
+
+  
+  janela_7.mainloop()
+ 
 
     
 
