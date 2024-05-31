@@ -136,6 +136,10 @@ def fechar_janela_2_abrir_janela_6():
 def fechar_janela_7_abrir_janela_6():
     janela_7.destroy()
     janela_principal()
+
+def fechar_janela_4_abrir_janela_6():
+    janela_4.destroy()
+    janela_principal()
     
     
 
@@ -316,19 +320,48 @@ def excluir_consulta():
     
     inserir_id = CTkEntry(frame_principal3, placeholder_text='Insira o ID',width=210, font=CTkFont(size=12), justify="center")
     inserir_id.grid(column=1, row=1, padx=10, pady=10)
+        
+   
     
-    
+    def remover_consulta(id):
+        id = inserir_id.get()
+        
+            
+        if id:
+                try:
+                    cursor.execute("SELECT * FROM consulta WHERE id = ?", (id,))
+                    resultado2 = cursor.fetchone()
+                    if resultado2:
+                        confirmar = messagebox.askyesno("Confirmação", f"Você deseja excluir a consulta com ID {id}?\n\n"
+                                                                f"Médico: {resultado2[1]}\n"
+                                                                f"Data: {resultado2[2]}\n"
+                                                                f"Horário: {resultado2[3]}\n"
+                                                                f"CPF: {resultado2[4]}")
+                        if confirmar:
+                            cursor.execute("DELETE FROM consulta WHERE id = ?", (id,))
+                            connection.commit()
+                            messagebox.showinfo('Consulta Removida', 'Consulta removida com sucesso!')
+                        else:
+                            messagebox.showinfo('Ação Cancelada', 'A consulta não foi removida.')
+                    else:
+                        messagebox.showinfo('Mensagem de Aviso', 'Consulta não encontrada. Insira um ID válido.')
+                except Exception as ex:
+                    messagebox.showerror('Erro', f'Erro inesperado: {str(ex)}')
+        else:
+                messagebox.showwarning('Aviso', 'Por favor, insira um ID.')
     
     
     verificarid = CTkButton(frame_principal3, text="Verificar ID", command=lambda:exibir_consulta(), image=CTkImage(imagem_botao), font=CTkFont(size=12))  
-    verificarid.grid(row=2, column=0, padx=10, pady=10)
+    verificarid.grid(row=2, column=1, padx=10, pady=10)        
     
+    remover_id = CTkButton(frame_principal3,text='Remover Consulta', command=lambda: remover_consulta(inserir_id.get()), image=CTkImage(imagem_botao), font=CTkFont(size=12))  
+    remover_id.grid(row=2, column=0, padx=10, pady=10)
     
-    
-    
+    voltar_id = CTkButton(frame_principal3,text='Cancelar', command=lambda:fechar_janela_4_abrir_janela_6(), image=CTkImage(imagem_botao), font=CTkFont(size=12))  
+    voltar_id.grid(row=3, column=0, padx=10, pady=10)
+
 
     
-
   
     janela_4.mainloop() # Fechamento da Janela
 
@@ -450,11 +483,11 @@ def exibir_consulta():
   set_appearance_mode("dark")
   set_default_color_theme("dark-blue")
   janela_7.title("PitMed: Gestão Clínica") 
-  janela_7.geometry("700x400")
+  janela_7.geometry("600x400")
   janela_7.resizable(False, False)
   
   titulo = CTkLabel(janela_7, text="Consultas Agendadas", font=CTkFont(family="Arial", size=15, weight="bold"))
-  titulo.place(x=250, y=35)
+  titulo.place(x=230, y=35)
   
   
   frame_descricao2 = CTkFrame(janela_7, width=220, height=400) 
@@ -463,35 +496,34 @@ def exibir_consulta():
   style = ttk.Style()
   style.configure("Treeview.Heading", font=('Arial', 10, 'bold'))
   
-  tree = ttk.Treeview(frame_descricao2, columns=("medico", "data", "horario", "cpf"), show='headings')
+  tree = ttk.Treeview(frame_descricao2, columns=("id","medico", "data", "horario", "cpf"), show='headings')
+  tree.heading("id",text="ID", anchor=tk.CENTER)
   tree.heading("medico",text="Médico", anchor=tk.CENTER)
   tree.heading("data", text="Data", anchor=tk.CENTER)
   tree.heading("horario", text="Horário", anchor=tk.CENTER)
   tree.heading("cpf", text="CPF", anchor=tk.CENTER)
+  
+  tree.column("id", width=80, anchor=tk.CENTER)
+  tree.column("medico", width=120, anchor=tk.CENTER)
+  tree.column("data", width=120, anchor=tk.CENTER)
+  tree.column("horario", width=120, anchor=tk.CENTER)
+  tree.column("cpf", width=120, anchor=tk.CENTER)
   tree.pack(fill="both", expand=True)
   
   scrollbar = ttk.Scrollbar(frame_descricao2, orient="vertical",command=tree.yview)
   scrollbar.pack(side="right", fill="y")
   tree.configure(yscrollcommand=scrollbar.set)
   
-  cursor.execute("SELECT medico, data, horario, cpf FROM consulta")
+  cursor.execute("SELECT id, medico, data, horario, cpf FROM consulta")
   consultas = cursor.fetchall()
   for consulta in consultas:
       tree.insert("", "end", values=consulta)
       
   tree.pack(padx=10, pady=10)
  
-      
-  
-  
-  
-  
-  
-  
-  
-  
-  #voltar2 = CTkButton(frame_descricao2, text="Voltar", command=lambda: fechar_janela_7_abrir_janela_6(),font=CTkFont(size=12))  
-  #voltar2.pack(padx=10,pady=10)
+
+  voltar2 = CTkButton(frame_descricao2, text="Voltar", command=lambda: fechar_janela_7_abrir_janela_6(),font=CTkFont(size=12))  
+  voltar2.pack(padx=10,pady=10)
 
   
   janela_7.mainloop()
