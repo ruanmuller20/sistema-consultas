@@ -85,7 +85,7 @@ def salvar_info_e_fechar_janela(nome, cpf, telefone, nascimento, especialidade):
                     # Inserir dados no banco de dados
                     inserir_informacao(nome, cpf, telefone, nascimento, especialidade)
                     messagebox.showinfo('Cadastro finalizado', 'Cadastro criado com sucesso!')
-                    fechar_janela_2_abrir_janela_4()
+                    fechar_janela_2_abrir_janela_3()
             except sqlite3.Error as e:
                 messagebox.showerror('Erro', f'Erro ao salvar informações: {e}')
     else:
@@ -104,7 +104,7 @@ def fechar_janela_6_abrir_janela_4():
     janela_6.destroy()
     excluir_consulta() 
 
-def fechar_janela_2_abrir_janela_4():
+def fechar_janela_2_abrir_janela_3():
     janela_2.destroy()
     marcar_consulta()
     
@@ -191,8 +191,8 @@ def informacoes_paciente():
     
     
     
-    confirmacao = CTkButton(janela_2, text="Confirmar", command=lambda: salvar_info_e_fechar_janela(nome_entrada.get(), cpf_entrada.get(), telefone_entrada.get(), nascimento_entrada.get(), especialidade_escolha.get()), image=CTkImage(imagem_botao), font=CTkFont(size=12))  
-    confirmacao.grid(column=0, row=5, padx=10, pady=10)
+    confirmacao = CTkButton(frame_principal, text="Confirmar", command=lambda: salvar_info_e_fechar_janela(nome_entrada.get(), cpf_entrada.get(), telefone_entrada.get(), nascimento_entrada.get(), especialidade_escolha.get()), image=CTkImage(imagem_botao), font=CTkFont(size=12))  
+    confirmacao.grid(column=1, row=5, padx=10, pady=10)
     
     voltar_2 = CTkButton(frame_principal,command= fechar_janela_2_abrir_janela_6, text="Voltar",image=CTkImage(imagem_botao), font=CTkFont(size=12))
     voltar_2.grid(column=0, row=5, padx=10, pady=10)
@@ -292,13 +292,38 @@ def marcar_consulta():
     janela_3.mainloop() # Fechamento da Janela 
     
 def excluir_consulta():
+    global janela_4
     janela_4 = CTk() # Abertura da Janela 
+    
+    titulo_excluir = CTkLabel(janela_4,text="Insira o ID atribuido a consulta:", font=CTkFont(family="Arial", size=15, weight="bold"))
+    titulo_excluir.place(x=220, y=35)
+    
+    titulo_excluir2 = CTkLabel(janela_4,text="*Clique o botão 'Verificar ID' para obter o ID da consulta*", font=CTkFont(family="Arial", size=12, weight="bold"))
+    titulo_excluir2.place(x=175, y=65)
     
     set_appearance_mode("dark")
     set_default_color_theme("dark-blue")
     janela_4.title("PitMed: Gestão Clínica")
-    janela_4.geometry("600x400")
+    janela_4.geometry("700x400")
     janela_4.resizable(False, False)
+    
+    frame_principal3 = CTkFrame(janela_4, width=580, height=200)
+    frame_principal3.place(x=65, y=90)
+    
+    
+    inseririd_descricao = CTkLabel(frame_principal3, text="Insira o ID da consulta que deseja excluir:", font=CTkFont(size=12))
+    inseririd_descricao.grid(column=0, row=1, padx=10, pady=10)
+    
+    inserir_id = CTkEntry(frame_principal3, placeholder_text='Insira o ID',width=210, font=CTkFont(size=12), justify="center")
+    inserir_id.grid(column=1, row=1, padx=10, pady=10)
+    
+    
+    
+    
+    verificarid = CTkButton(frame_principal3, text="Verificar ID", command=lambda:exibir_consulta(), image=CTkImage(imagem_botao), font=CTkFont(size=12))  
+    verificarid.grid(row=2, column=0, padx=10, pady=10)
+    
+    
     
     
 
@@ -311,8 +336,8 @@ def excluir_cadastro():
     global janela_5
     janela_5 = CTk() # Abertura da Janela 
     
-    titulo_exlusao = CTkLabel(janela_5, text="Preencha as informações a seguir:", font=CTkFont(family="Arial", size=15, weight="bold"))
-    titulo_exlusao.place(x=210, y=35)
+    titulo_exclusao = CTkLabel(janela_5, text="Preencha as informações a seguir:", font=CTkFont(family="Arial", size=15, weight="bold"))
+    titulo_exclusao.place(x=210, y=35)
     
     set_appearance_mode("dark")
     set_default_color_theme("dark-blue")
