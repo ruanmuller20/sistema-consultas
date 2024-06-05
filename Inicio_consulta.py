@@ -6,6 +6,8 @@ from PIL import Image, ImageTk
 from datetime import datetime, timedelta
 import tkinter as tk
 from tkinter import ttk
+from tkcalendar import *
+
 
 
 
@@ -260,11 +262,23 @@ def marcar_consulta():
         def validar_cpf(cpf):
                 return len(cpf) == 14 and cpf[3] == '.' and cpf[7] == '.' and cpf[11] == '-'
         
+        def validar_data(data):
+            try:
+                data_obj = datetime.strptime(data, '%d/%m/%Y')
+                # Verificar se a data selecionada é um dia útil (segunda a sexta-feira)
+                if data_obj.weekday() in [0, 1, 2, 3, 4]:  # 0 = segunda-feira, 1 = terça-feira, ..., 4 = sexta-feira
+                    return True
+                else:
+                    return False
+            except ValueError:
+                return False
+        
         try:
             if validar_cpf(cpf):
+                if validar_data(data):
                 # Verificar se o CPF existe no banco de dados
-                consulta_verificacao = "SELECT * FROM patients WHERE cpf = ?"
-                cursor.execute(consulta_verificacao, (cpf,))
+                 consulta_verificacao = "SELECT * FROM patients WHERE cpf = ?"
+                 cursor.execute(consulta_verificacao, (cpf,))
                 resultado = cursor.fetchone()
                 
                 if resultado:
@@ -280,7 +294,9 @@ def marcar_consulta():
                         messagebox.showinfo('Consulta marcada', 'Sua consulta foi marcada com sucesso!')
                         fechar_janela_3_abrir_janela_6()
                 else:
-                    messagebox.showerror('Erro', 'Paciente não encontrado. Verifique o CPF do paciente.')
+                   messagebox.showerror('Erro', 'Por favor, selecione uma data em um dia útil (segunda a sexta-feira).')
+            else:
+                 messagebox.showerror('Erro', 'Paciente não encontrado. Verifique o CPF do paciente.')
         except sqlite3.Error as e:
                 messagebox.showerror('Erro', f'Erro ao marcar consulta: {e}')
         except Exception as e:
