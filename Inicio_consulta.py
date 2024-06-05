@@ -171,7 +171,7 @@ def informacoes_paciente():
     cpf_descricao = CTkLabel(frame_principal, text="Digite o seu CPF:", font=CTkFont(size=12))
     cpf_descricao.grid(column=0, row=1, padx=10, pady=10)
 
-    cpf_entrada = CTkEntry(frame_principal, placeholder_text='Insira no formato xxx.xxx.xxx-xx)', width=210, font=CTkFont(size=12), justify="center")  
+    cpf_entrada = CTkEntry(frame_principal, placeholder_text='Insira no formato:xxx.xxx.xxx-xx', width=210, font=CTkFont(size=12), justify="center")  
     cpf_entrada.grid(column=1, row=1, padx=10, pady=10)
 
     telefone_descricao = CTkLabel(frame_principal, text="Digite o seu telefone com DDD:", font=CTkFont(size=12))
@@ -262,24 +262,31 @@ def marcar_consulta():
         
         try:
             if validar_cpf(cpf):
-                    # Verificar se o CPF existe no banco de dados
-                    consulta_verificacao = "SELECT * FROM patients WHERE cpf = ?"
-                    cursor.execute(consulta_verificacao, (cpf,))
-                    resultado = cursor.fetchone()
-            
-            if resultado:
-                inserir_consulta(medico, data, horario, cpf)
-                messagebox.showinfo('Consulta marcada','Sua consulta foi marcada com sucesso!')
-                fechar_janela_3_abrir_janela_6()
-            else:
-                messagebox.showerror('Erro', 'Paciente não encontrado. Verifique o CPF do paciente')
+                # Verificar se o CPF existe no banco de dados
+                consulta_verificacao = "SELECT * FROM patients WHERE cpf = ?"
+                cursor.execute(consulta_verificacao, (cpf,))
+                resultado = cursor.fetchone()
                 
+                if resultado:
+                    # Verificar se já existe uma consulta para o mesmo médico no mesmo horário
+                    consulta_existente = "SELECT * FROM consulta WHERE medico =? AND data =? AND horario =?"
+                    cursor.execute(consulta_existente, (medico, data, horario))
+                    consulta_duplicada = cursor.fetchone()
+                    
+                    if consulta_duplicada:
+                        messagebox.showerror('Erro', 'Já existe uma consulta marcada para este médico no mesmo horário.')
+                    else:
+                        inserir_consulta(medico, data, horario, cpf)
+                        messagebox.showinfo('Consulta marcada', 'Sua consulta foi marcada com sucesso!')
+                        fechar_janela_3_abrir_janela_6()
+                else:
+                    messagebox.showerror('Erro', 'Paciente não encontrado. Verifique o CPF do paciente.')
         except sqlite3.Error as e:
-            messagebox.showerror('Erro', f'Erro ao marcar consulta: {e}')
-        finally:
-            fechar_conexao()
-     
-        
+                messagebox.showerror('Erro', f'Erro ao marcar consulta: {e}')
+        except Exception as e:
+                messagebox.showerror('Erro', f'Erro desconhecido: {e}')
+      
+            
     confirmar = CTkButton(frame_principal3, command=salvar_consulta, text="Confirmar",image=CTkImage(imagem_botao), font=CTkFont(size=12))
     confirmar.grid(column=1, row=5, padx=10, pady=10)
     
@@ -522,8 +529,8 @@ def exibir_consulta():
   tree.pack(padx=10, pady=10)
  
 
-  voltar2 = CTkButton(frame_descricao2, text="Voltar", command=lambda: fechar_janela_7_abrir_janela_6(),font=CTkFont(size=12))  
-  voltar2.pack(padx=10,pady=10)
+#   voltar2 = CTkButton(frame_descricao2, text="Voltar", command=lambda: fechar_janela_7_abrir_janela_6(),font=CTkFont(size=12))  
+#   voltar2.pack(padx=10,pady=10)
 
   
   janela_7.mainloop()
